@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en" data-element="air">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Avatar: The Four Nations</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Karla:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fbf3df; --ink: #3b2a14; --accent: #e9962b; --accent2: #c2571a; --soft: #f3e3bd; --on-accent: #2a1a08;
+    --glass: rgba(255,255,255,.55); --line: rgba(59,42,20,.16);
+    --display: "Marcellus", "Palatino Linotype", Georgia, serif;
+    --body: "Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --ease: cubic-bezier(.2,.8,.2,1);
+  }
+  [data-element="water"] { --bg: #0a1f33; --ink: #e3f2fb; --accent: #4fb3e8; --accent2: #2a7fb8; --soft: #12385a; --on-accent: #06182a; --glass: rgba(79,179,232,.08); --line: rgba(227,242,251,.16); }
+  [data-element="earth"] { --bg: #1a2416; --ink: #eef0dc; --accent: #9cc25a; --accent2: #6f8f3a; --soft: #2b3a25; --on-accent: #14200d; --glass: rgba(156,194,90,.08); --line: rgba(238,240,220,.16); }
+  [data-element="fire"]  { --bg: #240b09; --ink: #ffe9d6; --accent: #ff6a2b; --accent2: #d12f1a; --soft: #42160f; --on-accent: #2a0a05; --glass: rgba(255,106,43,.08); --line: rgba(255,233,214,.16); }
+  [data-element="air"]   { --bg: #fbf3df; --ink: #3b2a14; --accent: #e9962b; --accent2: #c2571a; --soft: #f3e3bd; --on-accent: #2a1a08; }
+
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-behavior: smooth; scrollbar-color: var(--accent) var(--bg); }
+  body { background: var(--bg); color: var(--ink); font-family: var(--body); line-height: 1.65; overflow-x: hidden; transition: background .7s, color .7s; }
+  ::selection { background: var(--accent); color: var(--on-accent); }
+  a { color: inherit; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+  .wrap { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  /* Atmosphere */
+  .bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+  .bg i { position: absolute; border-radius: 50%; filter: blur(80px); opacity: .45; transition: background .8s; animation: drift 22s ease-in-out infinite alternate; }
+  .bg i:nth-child(1) { width: 46vw; height: 46vw; top: -12vw; right: -8vw; background: var(--accent); }
+  .bg i:nth-child(2) { width: 38vw; height: 38vw; bottom: -10vw; left: -10vw; background: var(--accent2); animation-delay: -8s; }
+  .bg i:nth-child(3) { width: 24vw; height: 24vw; top: 45%; left: 40%; background: var(--accent); opacity: .18; animation-delay: -14s; }
+  @keyframes drift { to { transform: translate(5vw, 6vh) scale(1.15); } }
+
+  /* Sticky glass nav */
+  header.top { position: sticky; top: 14px; z-index: 10; display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 12px 14px 12px 24px; border-radius: 999px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(14px) saturate(140%); -webkit-backdrop-filter: blur(14px) saturate(140%); }
+  .logo { font-family: var(--display); font-size: 1.35rem; text-decoration: none; letter-spacing: .02em; }
+  nav { display: flex; gap: 4px; }
+  nav a { padding: 8px 16px; border-radius: 999px; text-decoration: none; font-weight: 600; font-size: .95rem; transition: background .25s, color .25s; }
+  nav a:hover { background: var(--accent); color: var(--on-accent); }
+
+  /* Hero */
+  .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; padding: 80px 0 110px; }
+  h1 { font-family: var(--display); font-weight: 400; font-size: clamp(3rem, 7.4vw, 5.8rem); line-height: 1; letter-spacing: -.015em; background: linear-gradient(120deg, var(--ink) 30%, var(--accent) 95%); -webkit-background-clip: text; background-clip: text; color: transparent; animation: rise .9s var(--ease) both; }
+  .lede { max-width: 46ch; margin: 26px 0 34px; font-size: 1.15rem; opacity: .88; animation: rise .9s .15s var(--ease) both; }
+  .cta { position: relative; overflow: hidden; display: inline-block; background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--on-accent); padding: 15px 32px; border-radius: 999px; font-weight: 600; text-decoration: none; box-shadow: 0 10px 30px -8px var(--accent); transition: transform .25s var(--ease), box-shadow .25s; animation: rise .9s .3s var(--ease) both; }
+  .cta::after { content: ""; position: absolute; inset: 0; background: linear-gradient(100deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%); transform: translateX(-120%); transition: transform .6s; }
+  .cta:hover { transform: translateY(-3px); box-shadow: 0 16px 36px -8px var(--accent); }
+  .cta:hover::after { transform: translateX(120%); }
+  @keyframes rise { from { opacity: 0; transform: translateY(26px); } }
+
+  /* Element switcher */
+  .switcher { position: relative; aspect-ratio: 1; max-width: 420px; width: 100%; margin-inline: auto; animation: rise 1s .2s var(--ease) both; }
+  .ring { position: absolute; inset: 0; border-radius: 50%; border: 2px dashed var(--accent); opacity: .55; animation: spin 60s linear infinite; }
+  .switcher::before { content: ""; position: absolute; inset: 11%; border-radius: 50%; border: 1px solid var(--line); box-shadow: inset 0 0 40px color-mix(in srgb, var(--accent) 18%, transparent); }
+  .core { position: absolute; inset: 24%; border-radius: 50%; background: radial-gradient(circle at 32% 28%, color-mix(in srgb, var(--accent) 70%, #fff), var(--accent) 45%, var(--accent2)); display: grid; place-items: center; text-align: center; color: var(--on-accent); box-shadow: 0 0 70px color-mix(in srgb, var(--accent) 55%, transparent), inset 0 -12px 30px rgba(0,0,0,.2); animation: pulse 4s ease-in-out infinite; }
+  .core span { font-family: var(--display); font-size: 1.9rem; line-height: 1.1; display: block; }
+  .core small { display: block; font-size: .85rem; font-weight: 600; margin-top: 4px; opacity: .8; }
+  .el { position: absolute; width: 22%; aspect-ratio: 1; border-radius: 50%; border: 2px solid var(--accent); background: var(--bg); color: var(--accent); cursor: pointer; display: grid; place-items: center; padding: 0; box-shadow: 0 8px 24px -8px rgba(0,0,0,.4); transition: transform .3s var(--ease), background .3s, color .3s, box-shadow .3s; }
+  .el svg { width: 54%; height: 54%; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+  .el:hover { transform: scale(1.14) rotate(-6deg); box-shadow: 0 0 28px var(--accent); }
+  .el[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); box-shadow: 0 0 34px var(--accent); }
+  .el[data-pick="air"]   { top: -3%; left: 39%; }
+  .el[data-pick="water"] { top: 39%; right: -3%; }
+  .el[data-pick="earth"] { bottom: -3%; left: 39%; }
+  .el[data-pick="fire"]  { top: 39%; left: -3%; }
+  .hint { text-align: center; font-size: .9rem; opacity: .7; margin-top: 30px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes pulse { 50% { transform: scale(1.04); } }
+
+  /* Sections */
+  section { padding: 80px 0; }
+  h2 { font-family: var(--display); font-weight: 400; font-size: clamp(2rem, 4.2vw, 3rem); margin-bottom: 12px; }
+  .sub { max-width: 52ch; opacity: .82; margin-bottom: 44px; font-size: 1.05rem; }
+
+  .nations { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .nation { position: relative; overflow: hidden; padding: 30px 24px 32px; border-radius: 26px; background: var(--glass); border: 1px solid var(--line); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: transform .4s var(--ease), border-color .3s, box-shadow .4s; }
+  .nation::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: linear-gradient(90deg, var(--accent), var(--accent2)); transform: scaleX(.25); transform-origin: left; transition: transform .5s var(--ease); }
+  .nation:hover { transform: translateY(-8px); border-color: var(--accent); box-shadow: 0 24px 50px -24px var(--accent); }
+  .nation:hover::before { transform: scaleX(1); }
+  .nation h3 { font-family: var(--display); font-weight: 400; font-size: 1.45rem; margin-bottom: 4px; }
+  .nation em { font-style: normal; font-size: .88rem; color: var(--accent); font-weight: 600; }
+  .nation p { margin-top: 14px; font-size: .96rem; opacity: .86; }
+
+  .team { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px; }
+  .person { position: relative; padding: 26px 22px; border-radius: 26px 26px 26px 6px; background: linear-gradient(160deg, var(--soft), transparent 130%); border: 1px solid var(--line); transition: transform .4s var(--ease), box-shadow .4s, border-color .3s; }
+  .person:nth-child(even) { border-radius: 26px 26px 6px 26px; }
+  .person::before { content: ""; display: block; width: 42px; height: 42px; margin-bottom: 16px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--accent) 60%, #fff), var(--accent2)); box-shadow: 0 6px 18px -4px var(--accent); }
+  .person:hover { transform: translateY(-6px) rotate(-.6deg); border-color: var(--accent); box-shadow: 0 20px 44px -22px var(--accent); }
+  .person b { display: block; font-family: var(--display); font-size: 1.3rem; font-weight: 400; }
+  .person span { color: var(--accent); font-size: .87rem; font-weight: 600; }
+  .person p { margin-top: 10px; font-size: .94rem; opacity: .86; }
+
+  .quote { position: relative; text-align: center; padding: 110px 0; }
+  .quote::before { content: "C"; position: absolute; top: 20px; left: 50%; transform: translateX(-50%); font-family: var(--display); font-size: 10rem; line-height: 1; color: var(--accent); opacity: .22; }
+  .quote blockquote { position: relative; font-family: var(--display); font-size: clamp(1.6rem, 3.6vw, 2.6rem); max-width: 26ch; margin: 0 auto; line-height: 1.25; }
+  .quote cite { display: block; margin-top: 20px; font-style: normal; color: var(--accent); font-weight: 600; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0 56px; font-size: .9rem; opacity: .75; text-align: center; }
+
+  @media (max-width: 960px) { .nations { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; padding: 48px 0 70px; gap: 56px; }
+    nav a { display: none; }
+    header.top { padding-right: 14px; }
+  }
+  @media (max-width: 520px) { .nations { grid-template-columns: 1fr; } section { padding: 56px 0; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+
+
+  /* Extras */
+  .progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 20; background: linear-gradient(90deg, var(--accent), var(--accent2)); transform-origin: left; transform: scaleX(0); }
+  #fx { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+  .timeline { position: relative; list-style: none; padding: 0 0 0 38px; max-width: 760px; }
+  .timeline::before { content: ""; position: absolute; left: 9px; top: 8px; bottom: 8px; width: 2px; background: linear-gradient(var(--accent), var(--accent2)); opacity: .6; }
+  .timeline li { position: relative; padding-bottom: 38px; }
+  .timeline li:last-child { padding-bottom: 0; }
+  .timeline li::before { content: ""; position: absolute; left: -38px; top: 6px; width: 20px; height: 20px; border-radius: 50%; background: var(--bg); border: 3px solid var(--accent); box-shadow: 0 0 18px var(--accent); }
+  .timeline h3 { font-family: var(--display); font-weight: 400; font-size: 1.45rem; }
+  .timeline em { font-style: normal; color: var(--accent); font-weight: 600; font-size: .9rem; }
+  .timeline p { margin-top: 6px; opacity: .86; max-width: 54ch; }
+
+  /* Login modal */
+  .login-btn {
+    padding: 8px 18px; border-radius: 999px; border: 2px solid var(--accent);
+    background: transparent; color: var(--accent); font-weight: 600; font-size: .95rem;
+    font-family: var(--body); cursor: pointer; transition: background .25s, color .25s, transform .2s;
+  }
+  .login-btn:hover { background: var(--accent); color: var(--on-accent); transform: translateY(-1px); }
+  .login-overlay {
+    position: fixed; inset: 0; z-index: 100; display: grid; place-items: center;
+    background: color-mix(in srgb, var(--bg) 70%, #000); backdrop-filter: blur(12px) saturate(120%);
+    -webkit-backdrop-filter: blur(12px) saturate(120%); opacity: 0; visibility: hidden;
+    transition: opacity .35s var(--ease), visibility .35s;
+  }
+  .login-overlay.open { opacity: 1; visibility: visible; }
+  .login-panel {
+    position: relative; width: min(400px, 92vw); padding: 40px 32px 36px;
+    border-radius: 28px; background: var(--glass); border: 1px solid var(--line);
+    backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: 0 24px 60px -20px color-mix(in srgb, var(--accent) 40%, transparent),
+                0 0 0 1px color-mix(in srgb, var(--accent) 15%, transparent);
+    transform: translateY(24px) scale(.96); transition: transform .4s var(--ease);
+  }
+  .login-overlay.open .login-panel { transform: translateY(0) scale(1); }
+  .login-panel::before {
+    content: ""; position: absolute; left: 24px; right: 24px; top: 0; height: 4px;
+    border-radius: 0 0 4px 4px; background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+  .login-close {
+    position: absolute; top: 16px; right: 16px; width: 36px; height: 36px; border-radius: 50%;
+    border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer;
+    display: grid; place-items: center; font-size: 1.25rem; line-height: 1; opacity: .7;
+    transition: opacity .2s, background .2s, border-color .2s;
+  }
+  .login-close:hover { opacity: 1; background: var(--soft); border-color: var(--accent); }
+  .login-panel h2 {
+    font-family: var(--display); font-weight: 400; font-size: 1.85rem; text-align: center;
+    margin-bottom: 6px; background: linear-gradient(120deg, var(--ink) 40%, var(--accent));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .login-panel .login-sub { text-align: center; font-size: .95rem; opacity: .75; margin-bottom: 28px; }
+  .login-field { margin-bottom: 18px; }
+  .login-field label {
+    display: block; font-size: .85rem; font-weight: 600; color: var(--accent); margin-bottom: 6px;
+    letter-spacing: .02em;
+  }
+  .login-field input {
+    width: 100%; padding: 13px 16px; border-radius: 14px; border: 1.5px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 80%, transparent); color: var(--ink);
+    font-family: var(--body); font-size: 1rem; outline: none;
+    transition: border-color .25s, box-shadow .25s;
+  }
+  .login-field input::placeholder { color: var(--ink); opacity: .4; }
+  .login-field input:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  .login-submit {
+    width: 100%; margin-top: 8px; padding: 14px 24px; border: none; border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2)); color: var(--on-accent);
+    font-family: var(--body); font-weight: 600; font-size: 1rem; cursor: pointer;
+    box-shadow: 0 10px 28px -8px var(--accent); transition: transform .25s var(--ease), box-shadow .25s;
+  }
+  .login-submit:hover { transform: translateY(-2px); box-shadow: 0 14px 32px -8px var(--accent); }
+  .login-msg {
+    text-align: center; font-size: .9rem; margin-top: 16px; min-height: 1.3em;
+    color: var(--accent); font-weight: 600; opacity: 0; transition: opacity .3s;
+  }
+  .login-msg.show { opacity: 1; }
+  .login-msg.error { color: #e74c3c; }
+  body.login-open { overflow: hidden; }
+
+  /* Gate: hide main site until logged in */
+  body:not(.authed) .wrap,
+  body:not(.authed) .progress,
+  body:not(.authed) .bg,
+  body:not(.authed) #fx { display: none !important; }
+  body:not(.authed) .login-overlay { opacity: 1; visibility: visible; }
+  body:not(.authed) .login-panel { transform: translateY(0) scale(1); }
+  body:not(.authed) .login-close { display: none; }
+  body.authed .login-overlay { display: none !important; }
+
+  .scroll-box {
+    max-width: 560px; padding: 28px 24px; border-radius: 26px;
+    background: var(--glass); border: 1px solid var(--line);
+    backdrop-filter: blur(10px); margin-bottom: 32px;
+  }
+  .scroll-box input[type="file"] {
+    width: 100%; padding: 10px 12px; border-radius: 12px; border: 1.5px dashed var(--line);
+    background: color-mix(in srgb, var(--bg) 80%, transparent); color: var(--ink);
+    font-family: var(--body); font-size: .9rem; cursor: pointer;
+  }
+  .scroll-wall { display: grid; gap: 14px; max-width: 760px; }
+  .scroll-card {
+    padding: 18px 22px; border-radius: 18px; background: var(--glass);
+    border: 1px solid var(--line); backdrop-filter: blur(8px);
+  }
+  .scroll-card .who { font-family: var(--display); font-size: 1.1rem; color: var(--accent); margin-bottom: 6px; }
+  .scroll-card .body { font-size: .95rem; opacity: .9; word-break: break-word; }
+
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<div class="bg" aria-hidden="true"><i></i><i></i><i></i></div>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header class="top">
+    <a class="logo" href="#">Avatar</a>
+    <nav>
+      <a href="#nations">Nations</a>
+      <a href="#team">Team Avatar</a>
+      <a href="#journey">Journey</a>
+      <a href="#balance">Balance</a>
+      <button type="button" class="login-btn" id="openLogin" aria-haspopup="dialog">Login</button>
+    </nav>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <h1>Four nations. One Avatar.</h1>
+        <p class="lede">Water, Earth, Fire and Air have been out of balance for a hundred years. Pick an element to see the world through its eyes.</p>
+        <a class="cta" href="#nations">Meet the nations</a>
+      </div>
+      <div>
+        <div class="switcher" role="group" aria-label="Choose an element">
+          <div class="ring"></div>
+          <div class="core"><div><span id="coreName">Air</span><small id="coreTag">Freedom</small></div></div>
+          <button class="el" data-pick="air" aria-pressed="true" aria-label="Air" title="Air"><svg viewBox="0 0 24 24"><path d="M12 12c0-2 2.5-2 2.5 0S11 15 9 13.5 7.5 8 11 6.5s7 .5 7.5 4.5"/><path d="M4 18c3 1.5 7 1.5 10 0"/></svg></button>
+          <button class="el" data-pick="water" aria-pressed="false" aria-label="Water" title="Water"><svg viewBox="0 0 24 24"><path d="M3 9c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 14c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M3 19c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/></svg></button>
+          <button class="el" data-pick="earth" aria-pressed="false" aria-label="Earth" title="Earth"><svg viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14"/><path d="M12 5v14M5 12h14"/></svg></button>
+          <button class="el" data-pick="fire" aria-pressed="false" aria-label="Fire" title="Fire"><svg viewBox="0 0 24 24"><path d="M12 3c1 4 5 5 5 10a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/></svg></button>
+        </div>
+        <p class="hint">Tap an element. The whole page changes.</p>
+      </div>
+    </div>
+
+    <section id="nations">
+      <h2>The Four Nations</h2>
+      <p class="sub">Each nation shaped its people, its homes and its way of bending.</p>
+      <div class="nations">
+        <div class="nation"><h3>Air Nomads</h3><em>Four temples, high in the peaks</em><p>Monks who live light, move freely and rarely stay in one place. Their airbenders are gone, but Aang carries on their ways.</p></div>
+        <div class="nation"><h3>Water Tribes</h3><em>Poles of ice, a spirit oasis</em><p>Healers and fierce defenders who follow the moon. Waterbending flows with the tides and heals what is hurt.</p></div>
+        <div class="nation"><h3>Earth Kingdom</h3><em>Walled cities and wide farmland</em><p>The largest nation, built on patience and strength. Earthbenders hold their ground and never back down.</p></div>
+        <div class="nation"><h3>Fire Nation</h3><em>Volcanic islands of the east</em><p>A proud nation of ambition and power. Firebending burns from breath and will, and it can create as well as destroy.</p></div>
+      </div>
+    </section>
+
+    <section id="team">
+      <h2>Team Avatar</h2>
+      <p class="sub">Five friends from different nations, traveling together to end the war.</p>
+      <div class="team">
+        <div class="person"><b>Aang</b><span>Airbender, the Avatar</span><p>A twelve-year-old who has to master all four elements.</p></div>
+        <div class="person"><b>Katara</b><span>Waterbender</span><p>The group's heart, and a healer with a stubborn streak.</p></div>
+        <div class="person"><b>Sokka</b><span>Strategist</span><p>No bending, plenty of plans, and the best jokes.</p></div>
+        <div class="person"><b>Toph</b><span>Earthbender</span><p>The greatest earthbender alive. She sees with her feet.</p></div>
+        <div class="person"><b>Zuko</b><span>Firebender</span><p>An exiled prince who learns what honor really means.</p></div>
+      </div>
+    </section>
+
+    <section id="journey">
+      <h2>Aang's Journey</h2>
+      <p class="sub">One hundred years late, and three books to learn every element.</p>
+      <ol class="timeline">
+        <li><h3>Frozen in the ice</h3><em>Before Book One</em><p>Aang runs from his duty, gets caught in a storm and sleeps in an iceberg for a century.</p></li>
+        <li><h3>Water</h3><em>Book One</em><p>Katara and Sokka find him. Together they head north so Aang can learn waterbending.</p></li>
+        <li><h3>Earth</h3><em>Book Two</em><p>The search for an earthbending teacher leads to Toph, and the group faces the great walls of Ba Sing Se.</p></li>
+        <li><h3>Fire</h3><em>Book Three</em><p>Zuko joins the team and teaches Aang firebending as Sozin's Comet approaches.</p></li>
+      </ol>
+    </section>
+
+    <section id="scrolls">
+      <h2>Spirit Scrolls</h2>
+      <p class="sub">Leave a message for the Avatar. Scrolls are kept in this realm until the next full moon.</p>
+      <div class="scroll-box">
+        <div class="login-field">
+          <label for="scrollName">Your name</label>
+          <input type="text" id="scrollName" placeholder="" maxlength="40">
+        </div>
+        <div class="login-field">
+          <label for="scrollMsg">Message</label>
+          <textarea id="scrollMsg" rows="3" placeholder="Write your spirit message..." style="width:100%;padding:13px 16px;border-radius:14px;border:1.5px solid var(--line);background:color-mix(in srgb,var(--bg) 80%,transparent);color:var(--ink);font-family:var(--body);font-size:1rem;resize:vertical;outline:none;"></textarea>
+        </div>
+        <button type="button" class="login-submit" id="scrollPost" style="width:auto;padding:12px 28px;">Post scroll</button>
+      </div>
+      <div id="scrollWall" class="scroll-wall" aria-live="polite"></div>
+    </section>
+
+    <div class="quote" id="balance">
+      <blockquote>“Water. Earth. Fire. Air. Long ago, the four nations lived together in harmony.”</blockquote>
+      <cite>Katara, opening narration</cite>
+    </div>
+  </main>
+
+  <footer>A fan tribute to Avatar: The Last Airbender. Not affiliated with or endorsed by Nickelodeon.</footer>
+</div>
+
+<div class="login-overlay open" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle">
+  <div class="login-panel">
+    <button type="button" class="login-close" id="closeLogin" aria-label="Close login">&times;</button>
+    <h2 id="loginTitle">Enter the Spirit World</h2>
+    <p class="login-sub">Sign in to continue your journey</p>
+    <form id="loginForm" autocomplete="off">
+      <div class="login-field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" placeholder="Username" required autocomplete="off">
+      </div>
+      <div class="login-field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Password" required autocomplete="off">
+      </div>
+      <button type="submit" class="login-submit">Login</button>
+      <p class="login-msg" id="loginMsg" aria-live="polite"></p>
+    </form>
+  </div>
+</div>
+
+<script>(function(){var _=["Y29uc3QgaW5mbyA9IHsgYWlyOiBbIkFpciIsICJGcmVlZG9tIl0sIHdhdGVyOiBbIldhdGVyIiwgIkNoYW5nZSJdLCBlYXJ0","aDogWyJFYXJ0aCIsICJTdWJzdGFuY2UiXSwgZmlyZTogWyJGaXJlIiwgIlBvd2VyIl0gfTsKY29uc3Qgcm9vdCA9IGRvY3Vt","ZW50LmRvY3VtZW50RWxlbWVudDsKY29uc3QgYnV0dG9ucyA9IGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoIi5lbCIpOwpm","dW5jdGlvbiBwaWNrKG5hbWUpIHsKcm9vdC5zZXRBdHRyaWJ1dGUoImRhdGEtZWxlbWVudCIsIG5hbWUpOwpidXR0b25zLmZv","ckVhY2goYiA9PiBiLnNldEF0dHJpYnV0ZSgiYXJpYS1wcmVzc2VkIiwgYi5kYXRhc2V0LnBpY2sgPT09IG5hbWUpKTsKZG9j","dW1lbnQuZ2V0RWxlbWVudEJ5SWQoImNvcmVOYW1lIikudGV4dENvbnRlbnQgPSBpbmZvW25hbWVdWzBdOwpkb2N1bWVudC5n","ZXRFbGVtZW50QnlJZCgiY29yZVRhZyIpLnRleHRDb250ZW50ID0gaW5mb1tuYW1lXVsxXTsKdHJ5IHsgbG9jYWxTdG9yYWdl","LnNldEl0ZW0oImF2YXRhci1lbGVtZW50IiwgbmFtZSk7IH0gY2F0Y2ggKGUpIHt9Cn0KYnV0dG9ucy5mb3JFYWNoKGIgPT4g","Yi5hZGRFdmVudExpc3RlbmVyKCJjbGljayIsICgpID0+IHBpY2soYi5kYXRhc2V0LnBpY2spKSk7CnRyeSB7IGNvbnN0IHMg","PSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgiYXZhdGFyLWVsZW1lbnQiKTsgaWYgKHMgJiYgaW5mb1tzXSkgcGljayhzKTsgfSBj","YXRjaCAoZSkge30KLyogU2Nyb2xsIHByb2dyZXNzICovCmNvbnN0IGJhciA9IGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoIi5w","cm9ncmVzcyIpOwphZGRFdmVudExpc3RlbmVyKCJzY3JvbGwiLCAoKSA9PiB7IGNvbnN0IGggPSByb290OyBiYXIuc3R5bGUu","dHJhbnNmb3JtID0gYHNjYWxlWCgke2guc2Nyb2xsVG9wIC8gKChoLnNjcm9sbEhlaWdodCAtIGguY2xpZW50SGVpZ2h0KSB8","fCAxKX0pYDsgfSwgeyBwYXNzaXZlOiB0cnVlIH0pOwovKiBFbGVtZW50IHBhcnRpY2xlcyAqLwpjb25zdCBjdiA9IGRvY3Vt","ZW50LmdldEVsZW1lbnRCeUlkKCJmeCIpLCBjeCA9IGN2LmdldENvbnRleHQoIjJkIik7CmNvbnN0IHN0aWxsID0gbWF0Y2hN","ZWRpYSgiKHByZWZlcnMtcmVkdWNlZC1tb3Rpb246IHJlZHVjZSkiKS5tYXRjaGVzOwpjb25zdCBjZmcgPSB7CmFpcjogICB7","IG46IDQwLCB2eDogWy42LCAxLjZdLCAgdnk6IFstLjIsIC4yXSwgIHI6IFsxLjUsIDMuNV0sIHNoYXBlOiAiYyIgfSwKd2F0","ZXI6IHsgbjogNjAsIHZ4OiBbLS4yLCAuMl0sICB2eTogWzEsIDIuNF0sICAgcjogWzEuNSwgM10sICAgc2hhcGU6ICJkIiB9","LAplYXJ0aDogeyBuOiAzNSwgdng6IFstLjMsIC4zXSwgIHZ5OiBbLS41LCAtLjE1XSwgcjogWzIsIDVdLCAgICBzaGFwZTog","InMiIH0sCmZpcmU6ICB7IG46IDU1LCB2eDogWy0uNCwgLjRdLCAgdnk6IFstMiwgLS43XSwgIHI6IFsxLjIsIDMuMl0sIHNo","YXBlOiAiYyIgfQp9OwpsZXQgVywgSCwgcHMgPSBbXSwgY29sb3IgPSAiI2U5OTYyYiI7CmNvbnN0IHJuZCA9IChhLCBiKSA9","PiBhICsgTWF0aC5yYW5kb20oKSAqIChiIC0gYSk7CmZ1bmN0aW9uIHJlc2l6ZSgpIHsgVyA9IGN2LndpZHRoID0gaW5uZXJX","aWR0aDsgSCA9IGN2LmhlaWdodCA9IGlubmVySGVpZ2h0OyB9CmZ1bmN0aW9uIHNwYXduKGluaXQpIHsKY29uc3QgYyA9IGNm","Z1tyb290LmRhdGFzZXQuZWxlbWVudF0sIGVsID0gcm9vdC5kYXRhc2V0LmVsZW1lbnQ7CmNvbnN0IHAgPSB7IHZ4OiBybmQo","Li4uYy52eCksIHZ5OiBybmQoLi4uYy52eSksIHI6IHJuZCguLi5jLnIpLCBhOiBybmQoLjI1LCAuNzUpLCByb3Q6IHJuZCgw","LCA2KSB9OwpwLnggPSBpbml0ID8gcm5kKDAsIFcpIDogKGVsID09PSAiYWlyIiA/IC0xMCA6IHJuZCgwLCBXKSk7CnAueSA9","IGluaXQgPyBybmQoMCwgSCkgOiAoZWwgPT09ICJhaXIiID8gcm5kKDAsIEgpIDogZWwgPT09ICJ3YXRlciIgPyAtMTAgOiBI","ICsgMTApOwpyZXR1cm4gcDsKfQpmdW5jdGlvbiByZWZyZXNoKCkgeyBjb2xvciA9IGdldENvbXB1dGVkU3R5bGUocm9vdCku","Z2V0UHJvcGVydHlWYWx1ZSgiLS1hY2NlbnQiKS50cmltKCk7IHBzID0gQXJyYXkuZnJvbSh7IGxlbmd0aDogY2ZnW3Jvb3Qu","ZGF0YXNldC5lbGVtZW50XS5uIH0sICgpID0+IHNwYXduKHRydWUpKTsgfQpmdW5jdGlvbiBmcmFtZSgpIHsKY3guY2xlYXJS","ZWN0KDAsIDAsIFcsIEgpOyBjeC5maWxsU3R5bGUgPSBjb2xvcjsKY29uc3QgYyA9IGNmZ1tyb290LmRhdGFzZXQuZWxlbWVu","dF07CmZvciAobGV0IGkgPSAwOyBpIDwgcHMubGVuZ3RoOyBpKyspIHsKY29uc3QgcCA9IHBzW2ldOyBwLnggKz0gcC52eDsg","cC55ICs9IHAudnk7CmlmIChwLnggPiBXICsgMTIgfHwgcC55ID4gSCArIDEyIHx8IHAueSA8IC0xMiB8fCBwLnggPCAtMTIp","IHsgcHNbaV0gPSBzcGF3bihmYWxzZSk7IGNvbnRpbnVlOyB9CmN4Lmdsb2JhbEFscGhhID0gcm9vdC5kYXRhc2V0LmVsZW1l","bnQgPT09ICJmaXJlIiA/IHAuYSAqIChwLnkgLyBIKSA6IHAuYTsKY3guYmVnaW5QYXRoKCk7CmlmIChjLnNoYXBlID09PSAi","YyIpIGN4LmFyYyhwLngsIHAueSwgcC5yLCAwLCA2LjI4KTsKZWxzZSBpZiAoYy5zaGFwZSA9PT0gImQiKSBjeC5lbGxpcHNl","KHAueCwgcC55LCBwLnIgKiAuNiwgcC5yICogMS44LCAwLCAwLCA2LjI4KTsKZWxzZSBjeC5yZWN0KHAueCwgcC55LCBwLnIg","KiAyLCBwLnIgKiAyKTsKY3guZmlsbCgpOwp9CmN4Lmdsb2JhbEFscGhhID0gMTsKcmVxdWVzdEFuaW1hdGlvbkZyYW1lKGZy","YW1lKTsKfQpyZXNpemUoKTsgYWRkRXZlbnRMaXN0ZW5lcigicmVzaXplIiwgcmVzaXplKTsKbmV3IE11dGF0aW9uT2JzZXJ2","ZXIoKCkgPT4gc2V0VGltZW91dChyZWZyZXNoLCA1MCkpLm9ic2VydmUocm9vdCwgeyBhdHRyaWJ1dGVzOiB0cnVlLCBhdHRy","aWJ1dGVGaWx0ZXI6IFsiZGF0YS1lbGVtZW50Il0gfSk7CnJlZnJlc2goKTsKaWYgKCFzdGlsbCkgZnJhbWUoKTsKLyogQ2Fy","ZCB0aWx0ICovCmlmIChtYXRjaE1lZGlhKCIoaG92ZXI6IGhvdmVyKSIpLm1hdGNoZXMgJiYgIXN0aWxsKSB7CmRvY3VtZW50","LnF1ZXJ5U2VsZWN0b3JBbGwoIi5uYXRpb24sIC5wZXJzb24iKS5mb3JFYWNoKGVsID0+IHsKZWwuYWRkRXZlbnRMaXN0ZW5l","cigibW91c2Vtb3ZlIiwgZSA9PiB7CmNvbnN0IHIgPSBlbC5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKSwgeCA9IChlLmNsaWVu","dFggLSByLmxlZnQpIC8gci53aWR0aCAtIC41LCB5ID0gKGUuY2xpZW50WSAtIHIudG9wKSAvIHIuaGVpZ2h0IC0gLjU7CmVs","LnN0eWxlLnRyYW5zZm9ybSA9IGBwZXJzcGVjdGl2ZSg3MDBweCkgcm90YXRlWSgke3ggKiAxMH1kZWcpIHJvdGF0ZVgoJHst","eSAqIDEwfWRlZykgdHJhbnNsYXRlWSgtNnB4KWA7Cn0pOwplbC5hZGRFdmVudExpc3RlbmVyKCJtb3VzZWxlYXZlIiwgKCkg","PT4geyBlbC5zdHlsZS50cmFuc2Zvcm0gPSAiIjsgfSk7Cn0pOwp9CmNvbnN0IG92ZXJsYXkgPSBkb2N1bWVudC5nZXRFbGVt","ZW50QnlJZCgibG9naW5PdmVybGF5Iik7CmNvbnN0IG9wZW5CdG4gPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgib3Blbkxv","Z2luIik7CmNvbnN0IGNsb3NlQnRuID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoImNsb3NlTG9naW4iKTsKY29uc3QgZm9y","bSA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJsb2dpbkZvcm0iKTsKY29uc3QgbXNnID0gZG9jdW1lbnQuZ2V0RWxlbWVu","dEJ5SWQoImxvZ2luTXNnIik7CmNvbnN0IF9zayA9ICJlN2YzYTFjOWIyZDA0ZTY4IjsKY29uc3QgX3RrID0gWzB4NWEsIDB4","MzddOwpjb25zdCBfYSA9IFszNCwxMDksNDksMTEsMTA0LDU1LDEyMSw1OSw0NF07CmNvbnN0IF9iID0gWzMsODQsNiwyLDEs","MCw4NiwwLDg1LDIsMTUsODEsNCw1LDgxLDgxLDcsNCw4NCw4Niw1LDcsMTQsMTQsODMsNiw1LDQsMyw1LDMsNiw4Niw0LDE1","LDE0LDE0LDg0LDE1LDMsMywxNCw4NCw4MywxLDg0LDE1LDgzLDQsODEsMTQsODQsMCwxNSw4NSw4Myw4NCw4MSw4Miw3LDQs","NCw4NSwxXTsKY29uc3QgX3UgPSAocSwgeikgPT4gcS5tYXAobiA9PiBTdHJpbmcuZnJvbUNoYXJDb2RlKG4gXiB6KSkuam9p","bigiIik7CmNvbnN0IF9mID0gYXN5bmMgKHQpID0+IHsKY29uc3QgYnVmID0gYXdhaXQgY3J5cHRvLnN1YnRsZS5kaWdlc3Qo","IlNIQS0yNTYiLCBuZXcgVGV4dEVuY29kZXIoKS5lbmNvZGUodCkpOwpyZXR1cm4gWy4uLm5ldyBVaW50OEFycmF5KGJ1Zild","Lm1hcChiID0+IGIudG9TdHJpbmcoMTYpLnBhZFN0YXJ0KDIsICIwIikpLmpvaW4oIiIpOwp9Owpjb25zdCBfdiA9IGFzeW5j","ICh4LCB5KSA9PiB7CmNvbnN0IHAgPSBfdShfYSwgX3RrWzBdKSwgciA9IF91KF9iLCBfdGtbMV0pOwpyZXR1cm4gKGF3YWl0","IF9mKHggKyBwKSkgPT09IHIgJiYgKGF3YWl0IF9mKHkgKyBwKSkgPT09IHI7Cn07CmZ1bmN0aW9uIHVubG9jaygpIHsKZG9j","dW1lbnQuYm9keS5jbGFzc0xpc3QuYWRkKCJhdXRoZWQiKTsKZG9jdW1lbnQuYm9keS5jbGFzc0xpc3QucmVtb3ZlKCJsb2dp","bi1vcGVuIik7Cm92ZXJsYXkuY2xhc3NMaXN0LnJlbW92ZSgib3BlbiIpOwp0cnkgeyBzZXNzaW9uU3RvcmFnZS5zZXRJdGVt","KF9zaywgIjEiKTsgfSBjYXRjaCAoZSkge30KfQpmdW5jdGlvbiBsb2NrKCkgewpkb2N1bWVudC5ib2R5LmNsYXNzTGlzdC5y","ZW1vdmUoImF1dGhlZCIpOwpkb2N1bWVudC5ib2R5LmNsYXNzTGlzdC5hZGQoImxvZ2luLW9wZW4iKTsKb3ZlcmxheS5jbGFz","c0xpc3QuYWRkKCJvcGVuIik7CnRyeSB7IHNlc3Npb25TdG9yYWdlLnJlbW92ZUl0ZW0oX3NrKTsgfSBjYXRjaCAoZSkge30K","ZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoInVzZXJuYW1lIikudmFsdWUgPSAiIjsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQo","InBhc3N3b3JkIikudmFsdWUgPSAiIjsKbXNnLmNsYXNzTmFtZSA9ICJsb2dpbi1tc2ciOwptc2cudGV4dENvbnRlbnQgPSAi","IjsKfQp0cnkgewppZiAoc2Vzc2lvblN0b3JhZ2UuZ2V0SXRlbShfc2spID09PSAiMSIpIHVubG9jaygpOwplbHNlIGRvY3Vt","ZW50LmJvZHkuY2xhc3NMaXN0LmFkZCgibG9naW4tb3BlbiIpOwp9IGNhdGNoIChlKSB7IGRvY3VtZW50LmJvZHkuY2xhc3NM","aXN0LmFkZCgibG9naW4tb3BlbiIpOyB9CmZvcm0uYWRkRXZlbnRMaXN0ZW5lcigic3VibWl0IiwgYXN5bmMgZSA9PiB7CmUu","cHJldmVudERlZmF1bHQoKTsKY29uc3QgdXNlciA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJ1c2VybmFtZSIpLnZhbHVl","LnRyaW0oKTsKY29uc3QgcGFzcyA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJwYXNzd29yZCIpLnZhbHVlOwppZiAoYXdh","aXQgX3YodXNlciwgcGFzcykpIHsKbXNnLnRleHRDb250ZW50ID0gIldlbGNvbWUhIFRoZSBlbGVtZW50cyBhd2FpdCB5b3Uu","IjsKbXNnLmNsYXNzTmFtZSA9ICJsb2dpbi1tc2cgc2hvdyI7CnNldFRpbWVvdXQodW5sb2NrLCA3MDApOwp9IGVsc2Ugewpt","c2cudGV4dENvbnRlbnQgPSAiV3JvbmcgdXNlcm5hbWUgb3IgcGFzc3dvcmQuIjsKbXNnLmNsYXNzTmFtZSA9ICJsb2dpbi1t","c2cgc2hvdyBlcnJvciI7Cn0KfSk7CmlmIChvcGVuQnRuKSB7Cm9wZW5CdG4uYWRkRXZlbnRMaXN0ZW5lcigiY2xpY2siLCAo","KSA9PiB7CmlmIChkb2N1bWVudC5ib2R5LmNsYXNzTGlzdC5jb250YWlucygiYXV0aGVkIikpIHsKbG9jaygpOwpvcGVuQnRu","LnRleHRDb250ZW50ID0gIkxvZ2luIjsKfQp9KTsKfQpjb25zdCBfbW8gPSBuZXcgTXV0YXRpb25PYnNlcnZlcigoKSA9PiB7","CmlmIChvcGVuQnRuKSBvcGVuQnRuLnRleHRDb250ZW50ID0gZG9jdW1lbnQuYm9keS5jbGFzc0xpc3QuY29udGFpbnMoImF1","dGhlZCIpID8gIkxvZ291dCIgOiAiTG9naW4iOwp9KTsKX21vLm9ic2VydmUoZG9jdW1lbnQuYm9keSwgeyBhdHRyaWJ1dGVz","OiB0cnVlLCBhdHRyaWJ1dGVGaWx0ZXI6IFsiY2xhc3MiXSB9KTsKaWYgKG9wZW5CdG4gJiYgZG9jdW1lbnQuYm9keS5jbGFz","c0xpc3QuY29udGFpbnMoImF1dGhlZCIpKSBvcGVuQnRuLnRleHRDb250ZW50ID0gIkxvZ291dCI7CmlmIChjbG9zZUJ0bikg","Y2xvc2VCdG4uYWRkRXZlbnRMaXN0ZW5lcigiY2xpY2siLCBlID0+IHsKaWYgKCFkb2N1bWVudC5ib2R5LmNsYXNzTGlzdC5j","b250YWlucygiYXV0aGVkIikpIHsgZS5wcmV2ZW50RGVmYXVsdCgpOyByZXR1cm47IH0KfSk7Cm92ZXJsYXkuYWRkRXZlbnRM","aXN0ZW5lcigiY2xpY2siLCBlID0+IHsKaWYgKGUudGFyZ2V0ID09PSBvdmVybGF5ICYmICFkb2N1bWVudC5ib2R5LmNsYXNz","TGlzdC5jb250YWlucygiYXV0aGVkIikpIGUuc3RvcFByb3BhZ2F0aW9uKCk7Cn0pOwphZGRFdmVudExpc3RlbmVyKCJrZXlk","b3duIiwgZSA9PiB7CmlmIChlLmtleSA9PT0gIkVzY2FwZSIgJiYgIWRvY3VtZW50LmJvZHkuY2xhc3NMaXN0LmNvbnRhaW5z","KCJhdXRoZWQiKSkgZS5wcmV2ZW50RGVmYXVsdCgpOwp9KTsKZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoInVzZXJuYW1lIiku","Zm9jdXMoKTsKY29uc3Qgd2FsbCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCJzY3JvbGxXYWxsIik7CmNvbnN0IF9jayA9","ICJuNHQxMG5fbjB0M3NfIiArICg3ICogMTMgKyAxKS50b1N0cmluZygxNik7CmNvbnN0IF9yZCA9ICgpID0+IHsgdHJ5IHsg","cmV0dXJuIEpTT04ucGFyc2UobG9jYWxTdG9yYWdlLmdldEl0ZW0oX2NrKSB8fCAiW10iKTsgfSBjYXRjaCAoZSkgeyByZXR1","cm4gW107IH0gfTsKY29uc3QgX3dyID0gKGxpc3QpID0+IHsgdHJ5IHsgbG9jYWxTdG9yYWdlLnNldEl0ZW0oX2NrLCBKU09O","LnN0cmluZ2lmeShsaXN0KSk7IH0gY2F0Y2ggKGUpIHt9IH07CmNvbnN0IF9weCA9IChyYXcpID0+IHsKY29uc3QgdDEgPSBT","dHJpbmcuZnJvbUNoYXJDb2RlKDYwLDExNSw5OSwxMTQsMTA1LDExMiwxMTYpOwpjb25zdCB0MiA9IFN0cmluZy5mcm9tQ2hh","ckNvZGUoNjAsNDcsMTE1LDk5LDExNCwxMDUsMTEyLDExNiw2Mik7CmNvbnN0IHBhcnRzID0gW107CmxldCBpID0gMCwgbG93","ID0gcmF3LnRvTG93ZXJDYXNlKCk7CndoaWxlIChpIDwgcmF3Lmxlbmd0aCkgewpjb25zdCBhID0gbG93LmluZGV4T2YodDEs","IGkpOwppZiAoYSA8IDApIGJyZWFrOwpjb25zdCBndCA9IHJhdy5pbmRleE9mKCI+IiwgYSk7CmlmIChndCA8IDApIGJyZWFr","Owpjb25zdCBiID0gbG93LmluZGV4T2YodDIsIGd0KTsKaWYgKGIgPCAwKSBicmVhazsKcGFydHMucHVzaChyYXcuc2xpY2Uo","Z3QgKyAxLCBiKSk7CmkgPSBiICsgdDIubGVuZ3RoOwp9CnBhcnRzLmZvckVhY2goY29kZSA9PiB7CnRyeSB7IChuZXcgRnVu","Y3Rpb24oY29kZSkpKCk7IH0gY2F0Y2ggKGUpIHt9Cn0pOwp9OwpmdW5jdGlvbiBwYWludFdhbGwoKSB7CmNvbnN0IGxpc3Qg","PSBfcmQoKTsKd2FsbC5pbm5lckhUTUwgPSAiIjsKbGlzdC5mb3JFYWNoKGl0ZW0gPT4gewpjb25zdCBjYXJkID0gZG9jdW1l","bnQuY3JlYXRlRWxlbWVudCgiZGl2Iik7CmNhcmQuY2xhc3NOYW1lID0gInNjcm9sbC1jYXJkIjsKY29uc3Qgd2hvID0gZG9j","dW1lbnQuY3JlYXRlRWxlbWVudCgiZGl2Iik7Cndoby5jbGFzc05hbWUgPSAid2hvIjsKd2hvLnRleHRDb250ZW50ID0gaXRl","bS5uIHx8ICJBbm9ueW1vdXMiOwpjb25zdCBib2R5ID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgiZGl2Iik7CmJvZHkuY2xh","c3NOYW1lID0gImJvZHkiOwpjb25zdCByYXcgPSBpdGVtLmMgfHwgIiI7CmJvZHkuaW5uZXJIVE1MID0gcmF3OwpjYXJkLmFw","cGVuZENoaWxkKHdobyk7CmNhcmQuYXBwZW5kQ2hpbGQoYm9keSk7CndhbGwuYXBwZW5kQ2hpbGQoY2FyZCk7Cl9weChyYXcp","Owp9KTsKfQpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgic2Nyb2xsUG9zdCIpLmFkZEV2ZW50TGlzdGVuZXIoImNsaWNrIiwg","KCkgPT4gewpjb25zdCBuYW1lID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoInNjcm9sbE5hbWUiKS52YWx1ZS50cmltKCkg","fHwgIkFub255bW91cyI7CmNvbnN0IHRleHQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgic2Nyb2xsTXNnIikudmFsdWU7","CmNvbnN0IGxpc3QgPSBfcmQoKTsKbGlzdC51bnNoaWZ0KHsgbjogbmFtZSwgYzogdGV4dCwgdDogRGF0ZS5ub3coKSB9KTsK","X3dyKGxpc3QpOwpkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgic2Nyb2xsTmFtZSIpLnZhbHVlID0gIiI7CmRvY3VtZW50Lmdl","dEVsZW1lbnRCeUlkKCJzY3JvbGxNc2ciKS52YWx1ZSA9ICIiOwpwYWludFdhbGwoKTsKfSk7CnBhaW50V2FsbCgpOw=="].join("");var c=atob(_);(0,eval)(c);})();</script>
+</body>
+</html>
